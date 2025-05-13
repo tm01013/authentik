@@ -88,6 +88,15 @@ def default_token_key() -> str:
     # to use in Emails (for verification) and URLs (for recovery)
     return generate_id(token_length)
 
+class SessionValidation(models.Model):
+    # custom logic for invitations
+    session_key = models.CharField(max_length=40, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+    expires = models.DateTimeField()
+
+    @classmethod
+    def cleanup(cls):
+        cls.objects.filter(expires__lt=timezone.now()).delete()
 
 class UserTypes(models.TextChoices):
     """User types, both for grouping, licensing and permissions in the case
